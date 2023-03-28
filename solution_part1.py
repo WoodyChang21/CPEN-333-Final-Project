@@ -109,7 +109,7 @@ class Game():
         # note that it is a list of tuples, each being an
         # (x, y) tuple. Initially its size is 5 tuples.       
         self.snakeCoordinates = [(495, 55), (485, 55), (475, 55),
-                                 (465, 55), (455, 55)]
+                                 (465, 55), (455, 55), (445,55),(435,55),(425,55)]
         # initial direction of the snake
         self.direction = "Left"
         self.gameNotOver = True
@@ -123,7 +123,7 @@ class Game():
             Use the SPEED constant to set how often the move tasks
             are generated.
         """
-        SPEED = 0.15     # speed of snake updates (sec)
+        SPEED = 0.15/3     # speed of snake updates (sec)
         while self.gameNotOver:
             self.move()
             time.sleep(SPEED)
@@ -161,9 +161,21 @@ class Game():
         """
         newSnakeCoordinates = self.calculateNewCoordinates()
         self.snakeCoordinates.append(newSnakeCoordinates)
+        
+        head_coord = self.snakeCoordinates[-1]
+        second_body_coord = self.snakeCoordinates[-2]
 
+        buffer = 2.5
 
-        if self.snakeCoordinates[-1] == self.prey:
+        collide_x = (head_coord[0]<=self.prey[0]<=second_body_coord[0] or second_body_coord[0]<=self.prey[0]<=head_coord[0]) and \
+                    (head_coord[1]-buffer<=self.prey[1]<=head_coord[1]+buffer)
+        
+        collide_y = (head_coord[1]<=self.prey[1]<=second_body_coord[1] or second_body_coord[1]<=self.prey[1]<=head_coord[1]) and \
+                    (head_coord[0]-buffer<=self.prey[0]<=head_coord[0]+buffer)
+
+        #Passes X
+        if collide_x or collide_y:
+            print("Collide")
             self.score += 10
             self.queue.put({"score": self.score})
             self.createNewPrey()
@@ -185,13 +197,13 @@ class Game():
         lastX, lastY = self.snakeCoordinates[-1]
 
         if self.direction == "Left":
-            new_coordinates = (lastX - SNAKE_ICON_WIDTH, lastY)
+            new_coordinates = (lastX - SNAKE_ICON_WIDTH/3, lastY)
         elif self.direction == "Right":
-            new_coordinates = (lastX + SNAKE_ICON_WIDTH, lastY)
+            new_coordinates = (lastX + SNAKE_ICON_WIDTH/3, lastY)
         elif self.direction == "Up":
-            new_coordinates = (lastX, lastY - SNAKE_ICON_WIDTH)
+            new_coordinates = (lastX, lastY - SNAKE_ICON_WIDTH/3)
         elif self.direction == "Down":
-            new_coordinates = (lastX, lastY + SNAKE_ICON_WIDTH)
+            new_coordinates = (lastX, lastY + SNAKE_ICON_WIDTH/3)
         return new_coordinates
 
     def isGameOver(self, snakeCoordinates) -> None:
